@@ -1,4 +1,4 @@
-# Oracle 18c XE
+# Oracle 18c XE (gerando nova imagem)
 
 ### Método que usa oraclelinux:7-slim
 - [Guia de instruções](https://github.com/felipethomas/docker-oracle-xe/blob/master/README.md)
@@ -36,3 +36,27 @@
 - yum -y localinstall oracle-database-xe-18c-1.0-1.x86_64.rpm  
 - /etc/init.d/oracle-xe-18c configure  
 
+# Oracle 18c XE (usando imagem existente)
+
+- mkdir container-18c.1.0.1-xe  
+- chmod -R o+w container-18c.1.0.1-xe  
+- docker run -d \  
+-p 32118:1521 \  
+-p 35518:5500 \  
+--name=oracle18c_xe \  
+--volume /home/01308900490/ambientes/oracle/container-18c.1.0.1-xe:/opt/oracle/oradata \  
+felipethomas/oracle:18c  
+- docker logs oracle18c_xe (aguardar "Completed: ALTER PLUGGABLE DATABASE XEPDB1 SAVE STATE")  
+- docker ps (aguardar STATUS "healthy")  
+
+# Configuração para start no boot
+
+- sudo systemctl enable docker  
+- docker rename oracle18c_xe oracle_backup  
+- docker run -d --restart always \  
+-p 32118:1521 \  
+-p 35518:5500 \  
+--name=oracle18c_xe \  
+--volume /home/01308900490/ambientes/oracle/container-18c.1.0.1-xe:/opt/oracle/oradata \  
+felipethomas/oracle:18c  
+- docker container ps --filter "name=oracle18c_xe" --format "table {{.Names}}\t{{.Status}}"  
